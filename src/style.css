@@ -14,21 +14,22 @@
     opacity: 0,6;
 }
 
-section {
+.incomeExpense {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-section .income-container {
-    margin: 10px;
-    display: flex;
-}
-
 section {
     display: flex;
     justify-content: center;
+    align-items: center;
     list-style: none;
+}
+
+section .income-container {
+    margin: 10px;
+    display: flex;
 }
 
 section button {

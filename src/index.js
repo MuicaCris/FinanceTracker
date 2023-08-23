@@ -5,8 +5,15 @@ const transaction = document.querySelector("#trans");
 const form = document.querySelector("#form");
 const description = document.querySelector("#desc");
 const amount = document.querySelector("#amount");
+const table = document.querySelector("#incomeExpense");
 
 const localStorageTrans = JSON.parse(localStorage.getItem("trans"));
+
+const date = new Date;
+let time = date.getTime()
+
+const jsonData = JSON.stringify(time);
+
 let transactions = localStorage.getItem("trans") !== null ? localStorageTrans : [];
 
 function loadTransactionDetails(transaction) {
@@ -18,6 +25,7 @@ function loadTransactionDetails(transaction) {
   item.innerHTML = `
     ${transaction.description}
     <span>${sign} ${Math.abs(transaction.amount)}</span>
+    <span>${getCurrentDate()}</span>
     <button class="btn-del" onclick="removeTrans(${transaction.id})">x</button>
   `;
 
@@ -36,20 +44,19 @@ function removeTrans(id) {
 
 function updateAmount() {
   const amounts = transactions.map((transaction) => transaction.amount);
-  const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
-  balance.innerHTML = ` ${total}`;
+  const totals = amounts.reduce((acc, item) => (acc += item), 0);
+  total.innerHTML = ` ${totals}`;
 
   const income = amounts
     .filter((item) => item > 0)
-    .reduce((acc, item) => (acc += item), 0)
-    .toFixed(2);
-  inc_amt.innerHTML = ` ${income}`;
+    .reduce((acc, item) => (acc += item), 0);
+  inc_amount.innerHTML = ` ${income}`;
 
   const expense = amounts
     .filter((item) => item < 0)
-    .reduce((acc, item) => (acc += item), 0)
-    .toFixed(2);
-  exp_amt.innerHTML = ` ${Math.abs(expense)}`;
+    .reduce((acc, item) => (acc += item), 0);
+
+  exp_amount.innerHTML = ` ${Math.abs(expense)}`;
 }
 
 function config() {
@@ -68,8 +75,10 @@ function addTransaction(e) {
       description: description.value,
       amount: +amount.value,
     };
+
     transactions.push(transaction);
     loadTransactionDetails(transaction);
+
     description.value = "";
     amount.value = "";
     updateAmount();
@@ -89,4 +98,16 @@ window.addEventListener("load", function () {
 
 function updateLocalStorage() {
   localStorage.setItem("trans", JSON.stringify(transactions));
+}
+
+function getCurrentDate() {
+  const time = new Date();
+  const ms = time.getTime();
+
+  const day = Math.floor((ms / 1000 / 60 / 60 / 24) % 30)
+  const hour = Math.floor((ms / 1000 / 60 / 60) % 24); 
+  const min = Math.floor((ms / 1000 / 60) % 60);
+  const sec = Math.floor((ms / 1000) % 60);
+
+  return day + ':' + hour + ':' + min + ':' + sec;
 }
