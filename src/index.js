@@ -7,6 +7,9 @@ const description = document.querySelector("#desc");
 const amount = document.querySelector("#amount");
 const table = document.querySelector("#incomeExpense");
 
+const expenseElements = document.getElementsByClassName("expenseElements")[0];
+const incomeElements = document.getElementsByClassName("incomeElements")[0];
+
 const localStorageTrans = JSON.parse(localStorage.getItem("trans"));
 
 const date = new Date;
@@ -18,18 +21,17 @@ let transactions = localStorage.getItem("trans") !== null ? localStorageTrans : 
 
 function loadTransactionDetails(transaction) {
   const sign = transaction.amount < 0 ? "-" : "+";
+  const category = sign === "-" ? expenseElements : incomeElements;
   const item = document.createElement("li");
 
   item.classList.add(transaction.amount < 0 ? "expense" : "income");
 
   item.innerHTML = `
-    ${transaction.description}
-    <span>${sign} ${Math.abs(transaction.amount)}</span>
-    <span>${getCurrentDate()}</span>
-    <button class="btn-del" onclick="removeTrans(${transaction.id})">x</button>
-  `;
+    ${transaction.description} 
+    <span>${sign} ${Math.abs(transaction.amount)} ${transaction.created_at}</span>
+    <button class="btn-del" onclick="removeTrans(${transaction.id})">x</button>`;
 
-  trans.appendChild(item);
+  category.appendChild(item);
 }
 
 function removeTrans(id) {
@@ -58,15 +60,17 @@ function updateAmount() {
 
   exp_amount.innerHTML = ` ${Math.abs(expense)}`;
 }
-
+ 
 function config() {
-  trans.innerHTML = "";
+  incomeElements.innerHTML = "";
+  expenseElements.innerHTML = "";
   transactions.forEach(loadTransactionDetails);
   updateAmount();
 }
 
 function addTransaction(e) {
   e.preventDefault();
+
   if (description.value.trim() == "" || amount.value.trim() == "") {
     alert("Please Enter Description and amount");
   } else {
@@ -74,13 +78,15 @@ function addTransaction(e) {
       id: uniqueId(),
       description: description.value,
       amount: +amount.value,
+      category: "salary",
+      created_at: getCurrentDate(),
     };
-
-    transactions.push(transaction);
-    loadTransactionDetails(transaction);
 
     description.value = "";
     amount.value = "";
+    transactions.push(transaction);
+    loadTransactionDetails(transaction);
+
     updateAmount();
     updateLocalStorage();
   }
@@ -101,13 +107,6 @@ function updateLocalStorage() {
 }
 
 function getCurrentDate() {
-  const time = new Date();
-  const ms = time.getTime();
-
-  const day = Math.floor((ms / 1000 / 60 / 60 / 24) % 30)
-  const hour = Math.floor((ms / 1000 / 60 / 60) % 24); 
-  const min = Math.floor((ms / 1000 / 60) % 60);
-  const sec = Math.floor((ms / 1000) % 60);
-
-  return day + ':' + hour + ':' + min + ':' + sec;
+  const current_date = new Date().toLocaleString('ro-RO');
+  return current_date;
 }
